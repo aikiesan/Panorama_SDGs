@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(copy .env.example .env)",
+      "Bash(tree:*)",
+      "Bash(pip install:*)",
+      "Bash(npm install:*)",
+      "Bash(python:*)",
+      "Bash(alembic revision:*)",
+      "Bash(set:*)",
+      "Bash(alembic upgrade:*)",
+      "Bash(pip uninstall:*)",
+      "Bash(start:*)",
+      "Bash(timeout /t 3)",
+      "Bash(curl:*)",
+      "Bash(uvicorn:*)",
+      "Bash(timeout /t 5)",
+      "Bash(git add:*)",
+      "Bash(dir nul 2)",
+      "Bash($null)",
+      "Bash(del nul 2)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd elegant UIA-styled layout and WebGIS dashboard\n\n- Created UIA-inspired color palette (architectural blues, warm accents)\n- Built minimalistic header, footer, and layout components\n- Designed professional landing page with Vision, Mission, and CTA sections\n- Implemented WebGIS-focused dashboard with Leaflet map integration\n- Added KPI cards, filter controls, and project detail side panel\n- Set up API service layer for backend communication\n- Configured React Router for navigation\n- Added marker clustering and interactive map features\n- Implemented responsive design for mobile and desktop\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(test:*)",
+      "Bash(du:*)",
+      "Bash(gh auth:*)",
+      "Bash(xargs grep:*)",
+      "Bash(gh pr:*)",
+      "Bash(xargs wc:*)",
+      "Bash(npx tsc *)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

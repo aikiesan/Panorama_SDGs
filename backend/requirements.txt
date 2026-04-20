@@ -1,0 +1,41 @@
+# FastAPI and server
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+gunicorn==21.2.0
+python-multipart==0.0.18
+mangum==0.17.0
+
+# Database
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10
+alembic==1.14.0
+geoalchemy2==0.15.2
+
+# Authentication
+python-jose[cryptography]==3.3.0
+passlib==1.7.4
+bcrypt==4.0.1
+python-dotenv==1.0.1
+
+# Email
+python-dateutil==2.9.0.post0
+aiosmtplib==3.0.2
+email-validator==2.2.0
+
+# CORS is handled by FastAPI middleware (no extra package needed)
+
+# Validation
+pydantic==2.10.5
+pydantic-settings==2.7.1
+
+# Rate limiting
+slowapi==0.1.9
+
+# S3-compatible storage (MinIO)
+boto3==1.34.0
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+httpx==0.28.1
+pytest-cov==6.0.0

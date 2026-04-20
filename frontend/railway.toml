@@ -1,0 +1,14 @@
+# Railway configuration for Atlas 3+3 Frontend
+# https://docs.railway.com/reference/config-as-code
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+# SPA root health check
+healthcheckPath = "/"
+healthcheckTimeout = 120
+
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

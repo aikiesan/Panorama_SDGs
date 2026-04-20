@@ -1,0 +1,186 @@
+/* UIA Design System Token Variables — aligned with sdg-assessment canonical tokens */
+:root {
+  /* Brand colors */
+  --uia-red: #AF201C;
+  --uia-blue: #577CB3;
+  --uia-violet: #484675;
+  --uia-dark: #6C6B69;
+  --uia-gray-light: #F7F6F6;
+  --uia-black: #000000;
+
+  /* Spacing (8px base) */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 40px;
+  --spacing-3xl: 48px;
+  --spacing-4xl: 64px;
+
+  /* Typography */
+  --font-display: 'Oswald', Impact, sans-serif;
+  --font-body: 'Merriweather', Georgia, serif;
+
+  /* UI */
+  --radius-pill: 999px;
+  --transition-speed: 0.2s;
+  --header-height: 72px;
+
+  /* Featured content */
+  --uia-featured-border-width: 5px;
+}
+
+/* Leaflet CSS imports - must come before Tailwind */
+@import 'leaflet/dist/leaflet.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans text-black bg-white antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-semibold tracking-uia-normal;
+  }
+
+  label {
+    @apply font-display font-bold text-uia-label uppercase text-uia-dark tracking-uia-wide;
+  }
+
+  img {
+    @apply rounded-none;  /* UIA design: no rounded images */
+  }
+}
+
+/* Custom animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+@keyframes blob {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Leaflet z-index containment — keep Leaflet controls below app overlays (z-40+) */
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 20;
+}
+
+@layer components {
+  /* Original component styles (kept for compatibility) */
+  .btn-primary {
+    @apply px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200;
+  }
+
+  /* UIA Primary Button */
+  .btn-uia-primary {
+    @apply inline-flex items-center justify-center px-6 py-2.5 bg-uia-blue text-white
+           border-2 border-uia-blue rounded-none font-display font-semibold uppercase
+           text-uia-button tracking-uia-wide transition-all duration-200
+           hover:bg-uia-violet hover:border-uia-violet;
+  }
+
+  /* UIA Outline Button */
+  .btn-uia-outline {
+    @apply inline-flex items-center justify-center px-6 py-2.5 bg-transparent text-uia-blue
+           border border-uia-dark rounded-none font-display font-semibold uppercase
+           text-uia-button tracking-uia-wide transition-all duration-200
+           hover:text-uia-red hover:border-uia-red;
+  }
+
+  /* UIA Card */
+  .card-uia {
+    @apply bg-uia-gray-light border border-uia-dark rounded-none p-8;
+  }
+
+  /* UIA Section Header */
+  .section-header-uia {
+    @apply font-display font-bold uppercase tracking-uia-wide text-uia-blue;
+  }
+
+  /* UIA Form Input */
+  .input-uia {
+    @apply w-full px-4 py-3.5 border border-gray-300 rounded-none bg-white text-black
+           focus:outline-none focus:border-uia-dark-button focus:ring-2 focus:ring-uia-dark-button/10;
+  }
+
+  /* =========================================================
+     UIA Featured Content Border System
+     Signature 5px accent borders (from UIA website pattern)
+     ========================================================= */
+  .uia-featured-border {
+    @apply border-l-5 border-uia-red transition-all duration-200;
+  }
+
+  .uia-featured-border:hover {
+    @apply border-uia-dark-button shadow-uia-card-hover;
+  }
+
+  /* Category color variants */
+  .uia-featured-border.tools {
+    @apply border-uia-blue;
+  }
+
+  .uia-featured-border.resources {
+    @apply border-uia-violet;
+  }
+
+  .uia-featured-border.priority {
+    @apply border-uia-red;
+  }
+
+  .uia-featured-border.neutral {
+    @apply border-uia-dark-button;
+  }
+}
+
+/* Global focus states for forms */
+input:focus,
+select:focus,
+textarea:focus {
+  @apply outline-none ring-2 ring-uia-dark-button/10 border-uia-dark-button;
+}

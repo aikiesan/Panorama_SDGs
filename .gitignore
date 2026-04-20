@@ -1,0 +1,66 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Deployment guides with credentials (use templates instead)
+*_DEPLOYMENT_GUIDE.md
+SUPABASE_SETUP_GUIDE.md
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist/
+dist-ssr/
+*.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Seed data (contains PII — never commit)
+data/seed/*.sql
+data/seed/*.dump
+
+# Logs
+logs/
+*.log
+
+# Coverage
+.coverage
+coverage/
+htmlcov/
+.pytest_cache/
+
+# Build
+build/
+*.egg-info/
+
+# Misc
+.cache/
+*.pdf
+.gemini/
+.claude/
