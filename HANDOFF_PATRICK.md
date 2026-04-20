@@ -38,7 +38,7 @@ No Python, Node.js, or database installation needed — everything runs in Docke
 Open a terminal (PowerShell or CMD) and run:
 
 ```bash
-git clone https://github.com/lucasnc-ops/UIA_Atlas_3-3.git atlas_33
+git clone https://github.com/aikiesan/Panorama_SDGs.git atlas_33
 cd atlas_33
 ```
 
