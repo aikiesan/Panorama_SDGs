@@ -106,6 +106,39 @@ Expected result: `309` (or similar).
 
 ---
 
+## Step 4b — Correct UIA Region Assignments (Required)
+
+> **Important notice for the IT team.**
+> The seed database (`seed.sql`) contains the full project dataset as exported from the project team's environment. A data-correction script **must be run once** immediately after loading the seed, before the platform goes live.
+>
+> **Why this is needed:** The five UIA geographic regions (I–V) were historically mislabelled in the system, causing projects from The Americas and Africa to be stored under the wrong section codes. The labels have been corrected in the codebase to match the official UIA Guidebook, and this script realigns the existing project records to match.
+
+Run the following command after Step 4:
+
+```bash
+docker exec atlas_33-backend-1 python scripts/fix_regions_by_geography.py --apply
+```
+
+Expected output:
+```
+======================================================================
+  Total projects : 313
+  Need fixing    : 121
+  Unknown country: 1
+======================================================================
+Applying corrections...
+Done. 121 project(s) updated.
+```
+
+You can run it without `--apply` first to preview the corrections (dry run):
+```bash
+docker exec atlas_33-backend-1 python scripts/fix_regions_by_geography.py
+```
+
+> This step is **safe to re-run** — the script is idempotent (running it twice produces the same result). If the count of corrections shows 0 on a second run, the data is already correct.
+
+---
+
 ## Step 5 — Create Admin Account
 
 ```bash
