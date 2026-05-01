@@ -1,9 +1,9 @@
 export const UIA_REGIONS = [
   "Section I - Western Europe",
-  "Section II - Eastern Europe & Central Asia",
-  "Section III - Middle East & Africa",
-  "Section IV - Asia & Pacific",
-  "Section V - Americas",
+  "Section II - Central and Eastern Europe",
+  "Section III - The Americas",
+  "Section IV - Asia and Oceania",
+  "Section V - Africa",
 ];
 
 export const PROJECT_STATUSES = [

@@ -28,10 +28,10 @@ def _workflow_filter(show_submissions: bool):
 
 REGION_DISPLAY = {
     "SECTION_I":   "Section I - Western Europe",
-    "SECTION_II":  "Section II - Eastern Europe & Central Asia",
-    "SECTION_III": "Section III - Middle East & Africa",
-    "SECTION_IV":  "Section IV - Asia & Pacific",
-    "SECTION_V":   "Section V - Americas",
+    "SECTION_II":  "Section II - Central and Eastern Europe",
+    "SECTION_III": "Section III - The Americas",
+    "SECTION_IV":  "Section IV - Asia and Oceania",
+    "SECTION_V":   "Section V - Africa",
 }
 REGION_REVERSE = {v: k for k, v in REGION_DISPLAY.items()}
 

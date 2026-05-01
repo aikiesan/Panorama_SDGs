@@ -23,20 +23,20 @@ export const SDG_COLORS: Record<number, string> = {
 
 // 5 UIA Section colors — bold and geographically distinct
 export const REGION_COLORS: Record<string, string> = {
-  'Section I - Western Europe':                    '#577CB3',
-  'Section II - Eastern Europe & Central Asia':    '#7B68EE',
-  'Section III - Middle East & Africa':            '#C0392B',
-  'Section IV - Asia & Pacific':                   '#27AE60',
-  'Section V - Americas':                          '#E67E22',
+  'Section I - Western Europe':              '#577CB3',
+  'Section II - Central and Eastern Europe': '#7B68EE',
+  'Section III - The Americas':              '#C0392B',
+  'Section IV - Asia and Oceania':           '#27AE60',
+  'Section V - Africa':                      '#E67E22',
 };
 
 // Short labels for legend
 export const REGION_LABELS: Record<string, string> = {
-  'Section I - Western Europe':                    'I — Western Europe',
-  'Section II - Eastern Europe & Central Asia':    'II — Eastern Europe & Central Asia',
-  'Section III - Middle East & Africa':            'III — Middle East & Africa',
-  'Section IV - Asia & Pacific':                   'IV — Asia & Pacific',
-  'Section V - Americas':                          'V — Americas',
+  'Section I - Western Europe':              'I — Western Europe',
+  'Section II - Central and Eastern Europe': 'II — Central and Eastern Europe',
+  'Section III - The Americas':              'III — The Americas',
+  'Section IV - Asia and Oceania':           'IV — Asia and Oceania',
+  'Section V - Africa':                      'V — Africa',
 };
 
 type MarkerSize = 'small' | 'medium' | 'large';

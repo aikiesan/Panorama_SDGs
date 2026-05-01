@@ -19,16 +19,23 @@ _STATUS_MAP = {
 }
 
 _REGION_MAP = {
-    "SECTION_I": "SECTION_I",
-    "SECTION_II": "SECTION_II",
+    # internal codes
+    "SECTION_I":   "SECTION_I",
+    "SECTION_II":  "SECTION_II",
     "SECTION_III": "SECTION_III",
-    "SECTION_IV": "SECTION_IV",
-    "SECTION_V": "SECTION_V",
-    "Section I - Western Europe": "SECTION_I",
+    "SECTION_IV":  "SECTION_IV",
+    "SECTION_V":   "SECTION_V",
+    # canonical display strings (UIA Guidebook)
+    "Section I - Western Europe":              "SECTION_I",
+    "Section II - Central and Eastern Europe": "SECTION_II",
+    "Section III - The Americas":              "SECTION_III",
+    "Section IV - Asia and Oceania":           "SECTION_IV",
+    "Section V - Africa":                      "SECTION_V",
+    # legacy aliases — kept so old in-flight data is not rejected
     "Section II - Eastern Europe & Central Asia": "SECTION_II",
-    "Section III - Middle East & Africa": "SECTION_III",
-    "Section IV - Asia & Pacific": "SECTION_IV",
-    "Section V - Americas": "SECTION_V",
+    "Section III - Middle East & Africa":         "SECTION_III",
+    "Section IV - Asia & Pacific":                "SECTION_IV",
+    "Section V - Americas":                       "SECTION_V",
 }
 
 
