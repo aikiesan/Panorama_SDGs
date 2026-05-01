@@ -332,11 +332,11 @@ def _format_project_response(project: Project) -> dict:
     """Helper to format project with related data"""
     # Map region codes to readable labels
     region_labels = {
-        "SECTION_I": "Section I - Western Europe",
-        "SECTION_II": "Section II - Eastern Europe & Central Asia",
-        "SECTION_III": "Section III - Middle East & Africa",
-        "SECTION_IV": "Section IV - Asia & Pacific",
-        "SECTION_V": "Section V - Americas"
+        "SECTION_I":   "Section I - Western Europe",
+        "SECTION_II":  "Section II - Central and Eastern Europe",
+        "SECTION_III": "Section III - The Americas",
+        "SECTION_IV":  "Section IV - Asia and Oceania",
+        "SECTION_V":   "Section V - Africa",
     }
     
     region_value = project.uia_region.value if project.uia_region else None

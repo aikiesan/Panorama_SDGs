@@ -6,10 +6,10 @@ export type WorkflowStatus = 'submitted' | 'in_review' | 'approved' | 'rejected'
 
 export type UIARegion =
   | 'Section I - Western Europe'
-  | 'Section II - Eastern Europe & Central Asia'
-  | 'Section III - Middle East & Africa'
-  | 'Section IV - Asia & Pacific'
-  | 'Section V - Americas';
+  | 'Section II - Central and Eastern Europe'
+  | 'Section III - The Americas'
+  | 'Section IV - Asia and Oceania'
+  | 'Section V - Africa';
 
 export type ProjectTypology =
   | 'Residential'

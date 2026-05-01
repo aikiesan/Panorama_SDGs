@@ -1,9 +1,9 @@
 export const REGION_LABELS: Record<string, string> = {
   SECTION_I:   'Section I - Western Europe',
-  SECTION_II:  'Section II - Eastern Europe & Central Asia',
-  SECTION_III: 'Section III - Middle East & Africa',
-  SECTION_IV:  'Section IV - Asia & Pacific',
-  SECTION_V:   'Section V - Americas',
+  SECTION_II:  'Section II - Central and Eastern Europe',
+  SECTION_III: 'Section III - The Americas',
+  SECTION_IV:  'Section IV - Asia and Oceania',
+  SECTION_V:   'Section V - Africa',
 };
 
 export const COUNTRIES_BY_REGION: Record<string, string[]> = {
@@ -21,6 +21,29 @@ export const COUNTRIES_BY_REGION: Record<string, string[]> = {
     'Slovakia', 'Slovenia', 'Tajikistan', 'Turkey', 'Turkmenistan', 'Ukraine', 'Uzbekistan',
   ],
   SECTION_III: [
+    // The Americas
+    'Antigua and Barbuda', 'Argentina', 'Bahamas', 'Barbados', 'Belize',
+    'Bolivia', 'Brazil', 'Canada', 'Chile', 'Colombia', 'Costa Rica', 'Cuba',
+    'Dominica', 'Dominican Republic', 'Ecuador', 'El Salvador', 'Grenada',
+    'Guatemala', 'Guyana', 'Haiti', 'Honduras', 'Jamaica', 'Mexico',
+    'Nicaragua', 'Panama', 'Paraguay', 'Peru', 'Saint Kitts and Nevis',
+    'Saint Lucia', 'Saint Vincent and the Grenadines', 'Suriname',
+    'Trinidad and Tobago', 'United States', 'Uruguay', 'Venezuela',
+  ],
+  SECTION_IV: [
+    // Asia & Oceania
+    'Afghanistan', 'Australia', 'Bangladesh', 'Bhutan', 'Brunei', 'Cambodia',
+    'China', 'Fiji', 'Hong Kong', 'India', 'Indonesia', 'Japan', 'Laos',
+    'Malaysia', 'Maldives', 'Mongolia', 'Myanmar', 'Nepal', 'New Zealand',
+    'North Korea', 'Pakistan', 'Papua New Guinea', 'Philippines', 'Samoa',
+    'Singapore', 'South Korea', 'Sri Lanka', 'Taiwan', 'Thailand',
+    'Timor-Leste', 'Tonga', 'Vanuatu', 'Vietnam',
+    // Middle East (no standalone UIA Middle East region)
+    'Bahrain', 'Iran', 'Iraq', 'Israel', 'Jordan', 'Kuwait', 'Lebanon',
+    'Oman', 'Palestine', 'Qatar', 'Saudi Arabia', 'Syria',
+    'United Arab Emirates', 'Yemen',
+  ],
+  SECTION_V: [
     // Africa
     'Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi',
     'Cabo Verde', 'Cameroon', 'Central African Republic', 'Chad', 'Comoros',
@@ -32,27 +55,6 @@ export const COUNTRIES_BY_REGION: Record<string, string[]> = {
     'Senegal', 'Seychelles', 'Sierra Leone', 'Somalia', 'South Africa',
     'South Sudan', 'Sudan', 'Tanzania', 'Togo', 'Tunisia', 'Uganda',
     'Zambia', 'Zimbabwe',
-    // Middle East
-    'Bahrain', 'Iran', 'Iraq', 'Israel', 'Jordan', 'Kuwait', 'Lebanon',
-    'Oman', 'Palestine', 'Qatar', 'Saudi Arabia', 'Syria',
-    'United Arab Emirates', 'Yemen',
-  ],
-  SECTION_IV: [
-    'Afghanistan', 'Australia', 'Bangladesh', 'Bhutan', 'Brunei', 'Cambodia',
-    'China', 'Fiji', 'Hong Kong', 'India', 'Indonesia', 'Japan', 'Laos',
-    'Malaysia', 'Maldives', 'Mongolia', 'Myanmar', 'Nepal', 'New Zealand',
-    'North Korea', 'Pakistan', 'Papua New Guinea', 'Philippines', 'Samoa',
-    'Singapore', 'South Korea', 'Sri Lanka', 'Taiwan', 'Thailand',
-    'Timor-Leste', 'Tonga', 'Vanuatu', 'Vietnam',
-  ],
-  SECTION_V: [
-    'Antigua and Barbuda', 'Argentina', 'Bahamas', 'Barbados', 'Belize',
-    'Bolivia', 'Brazil', 'Canada', 'Chile', 'Colombia', 'Costa Rica', 'Cuba',
-    'Dominica', 'Dominican Republic', 'Ecuador', 'El Salvador', 'Grenada',
-    'Guatemala', 'Guyana', 'Haiti', 'Honduras', 'Jamaica', 'Mexico',
-    'Nicaragua', 'Panama', 'Paraguay', 'Peru', 'Saint Kitts and Nevis',
-    'Saint Lucia', 'Saint Vincent and the Grenadines', 'Suriname',
-    'Trinidad and Tobago', 'United States', 'Uruguay', 'Venezuela',
   ],
 };
 

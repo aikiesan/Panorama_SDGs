@@ -11,10 +11,10 @@ interface FilterControlsProps {
 const regions: (UIARegion | 'All Regions')[] = [
   'All Regions',
   'Section I - Western Europe',
-  'Section II - Eastern Europe & Central Asia',
-  'Section III - Middle East & Africa',
-  'Section IV - Asia & Pacific',
-  'Section V - Americas',
+  'Section II - Central and Eastern Europe',
+  'Section III - The Americas',
+  'Section IV - Asia and Oceania',
+  'Section V - Africa',
 ];
 
 const SDG_NUMBERS: SDG[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];

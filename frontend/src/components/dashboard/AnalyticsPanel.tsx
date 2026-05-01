@@ -28,18 +28,18 @@ const SDG_NAMES: Record<number, string> = {
 
 const SECTION_LABELS: Record<string, string> = {
   'Section I - Western Europe':              'S.I — W. Europe',
-  'Section II - Eastern Europe & Central Asia': 'S.II — E. Europe',
-  'Section III - Middle East & Africa':      'S.III — ME & Africa',
-  'Section IV - Asia & Pacific':             'S.IV — Asia',
-  'Section V - Americas':                    'S.V — Americas',
+  'Section II - Central and Eastern Europe': 'S.II — C&E Europe',
+  'Section III - The Americas':              'S.III — Americas',
+  'Section IV - Asia and Oceania':           'S.IV — Asia & Oceania',
+  'Section V - Africa':                      'S.V — Africa',
 };
 
 const SECTION_COLORS: Record<string, string> = {
   'Section I - Western Europe':              '#577CB3',
-  'Section II - Eastern Europe & Central Asia': '#7B68EE',
-  'Section III - Middle East & Africa':      '#C0392B',
-  'Section IV - Asia & Pacific':             '#27AE60',
-  'Section V - Americas':                    '#E67E22',
+  'Section II - Central and Eastern Europe': '#7B68EE',
+  'Section III - The Americas':              '#C0392B',
+  'Section IV - Asia and Oceania':           '#27AE60',
+  'Section V - Africa':                      '#E67E22',
 };
 
 const STATUS_COLORS: Record<string, string> = {
