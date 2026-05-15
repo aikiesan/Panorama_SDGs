@@ -1,15 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
+from datetime import datetime
 import uuid
 from uuid import UUID
 from ..core.database import get_db
 from ..core.deps import get_current_admin
 from ..core.config import settings
-from ..models.project import Project, WorkflowStatus
+from ..models.project import Project, ProjectSDG, WorkflowStatus
 from ..models.user import User
-from ..schemas.project import ProjectResponse, ProjectUpdate, ProjectListResponse
+from ..schemas.project import ProjectResponse, ProjectUpdate, ProjectListResponse, AdminVotePayload
 from .projects import _format_project_response
 from ..services.email import send_changes_requested_email, send_approval_email, send_rejection_email
 
@@ -57,6 +58,8 @@ async def get_all_projects(
     page: int = 1,
     page_size: int = 20,
     workflow_status: str = None,
+    voted: Optional[bool] = None,
+    search: Optional[str] = None,
     current_user: User = Depends(get_current_admin),
     db: Session = Depends(get_db)
 ):
@@ -66,6 +69,18 @@ async def get_all_projects(
 
     if workflow_status:
         query = query.filter(Project.workflow_status == workflow_status)
+
+    if voted is True:
+        query = query.filter(Project.admin_vote_sdg_1 != None)
+    elif voted is False:
+        query = query.filter(Project.admin_vote_sdg_1 == None)
+
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            Project.project_name.ilike(search_term) |
+            Project.organization_name.ilike(search_term)
+        )
 
     query = query.order_by(Project.created_at.desc())
 
@@ -119,6 +134,17 @@ async def update_project(
 
     # Update fields
     update_dict = update_data.model_dump(exclude_unset=True)
+
+    # Handle SDGs separately (relationship, not a plain column)
+    if 'sdgs' in update_dict:
+        sdg_entries = update_dict.pop('sdgs')
+        db.query(ProjectSDG).filter(ProjectSDG.project_id == project.id).delete()
+        for entry in (sdg_entries or []):
+            db.add(ProjectSDG(
+                project_id=project.id,
+                sdg_number=entry['sdg_number'],
+                justification=entry.get('justification'),
+            ))
 
     for field, value in update_dict.items():
         if hasattr(project, field):
@@ -215,6 +241,34 @@ async def request_changes(
     await send_changes_requested_email(project.contact_email, project.project_name, edit_link, body.message)
 
     return {"message": "Changes requested", "project_id": str(project_id)}
+
+
+@router.post("/projects/{project_id}/vote", response_model=ProjectResponse)
+async def vote_sdgs(
+    project_id: UUID,
+    body: AdminVotePayload,
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Record admin's SDG vote for a project (exactly 3 SDGs)"""
+
+    project = db.query(Project).filter(Project.id == project_id).first()
+
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    project.admin_vote_sdg_1 = body.sdg_numbers[0]
+    project.admin_vote_sdg_2 = body.sdg_numbers[1]
+    project.admin_vote_sdg_3 = body.sdg_numbers[2]
+    project.admin_voted_at = datetime.utcnow()
+    project.admin_voted_by = current_user.email
+    db.commit()
+    db.refresh(project)
+
+    return _format_project_response(project)
 
 
 @router.delete("/projects/{project_id}")

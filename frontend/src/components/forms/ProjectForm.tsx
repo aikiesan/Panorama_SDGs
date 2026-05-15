@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { projectsApi, type ProjectCreate } from '../../services/api/projects';
+import { projectsApi, type ProjectCreate, type SDGEntry } from '../../services/api/projects';
 import {
   PROJECT_STATUSES,
   TYPOLOGIES,
@@ -29,10 +30,14 @@ export default function ProjectForm({
   isSubmitting,
   submitError,
   isPublicSubmission = false,
-  submitLabel = 'Submit Project',
+  submitLabel,
 }: ProjectFormProps) {
+  const { t } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  // Per-SDG justification text, keyed by sdg_number
+  const [sdgJustifications, setSdgJustifications] = useState<Record<number, string>>({});
+  const [sdgErrors, setSdgErrors] = useState<Record<number, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<ProjectCreate>({
@@ -60,10 +65,18 @@ export default function ProjectForm({
         gdpr_consent: false,
         ...initialValues,
       });
+      // Restore justifications from initialValues
+      if (initialValues.sdgs) {
+        const justMap: Record<number, string> = {};
+        (initialValues.sdgs as SDGEntry[]).forEach(e => {
+          if (e.justification) justMap[e.sdg_number] = e.justification;
+        });
+        setSdgJustifications(justMap);
+      }
     }
   }, [initialValues, reset]);
 
-  const selectedSDGs = watch('sdgs');
+  const selectedSDGs = (watch('sdgs') || []) as SDGEntry[];
   const imageUrls = watch('image_urls') || [];
   const watchedRegion = watch('uia_region');
   const watchedBrief = watch('brief_description') ?? '';
@@ -76,17 +89,59 @@ export default function ProjectForm({
     setValue('country', '');
   }, [watchedRegion, setValue]);
 
-  const onFormSubmit: SubmitHandler<ProjectCreate> = async (data) => {
-    if (isPublicSubmission && !captchaToken) {
-      alert('Please verify that you are not a robot.');
-      return;
-    }
-    await onSubmit({ ...data, captcha_token: captchaToken || undefined });
-  };
+  const isSDGSelected = (id: number) => selectedSDGs.some(s => s.sdg_number === id);
 
   const toggleSDG = (id: number) => {
-    const current = selectedSDGs || [];
-    setValue('sdgs', current.includes(id) ? current.filter(s => s !== id) : [...current, id]);
+    const current = selectedSDGs;
+    if (isSDGSelected(id)) {
+      setValue('sdgs', current.filter(s => s.sdg_number !== id));
+      setSdgJustifications(prev => { const n = { ...prev }; delete n[id]; return n; });
+      setSdgErrors(prev => { const n = { ...prev }; delete n[id]; return n; });
+    } else {
+      setValue('sdgs', [...current, { sdg_number: id, justification: sdgJustifications[id] || '' }]);
+    }
+  };
+
+  const updateJustification = (id: number, text: string) => {
+    setSdgJustifications(prev => ({ ...prev, [id]: text }));
+    setSdgErrors(prev => ({ ...prev, [id]: '' }));
+    // Keep sdgs form value in sync
+    const current = selectedSDGs;
+    setValue('sdgs', current.map(s => s.sdg_number === id ? { ...s, justification: text } : s));
+  };
+
+  const onFormSubmit: SubmitHandler<ProjectCreate> = async (data) => {
+    if (isPublicSubmission && !captchaToken) {
+      alert(t('form.error_required'));
+      return;
+    }
+
+    // Validate justifications (min 30 chars if selected)
+    const newErrors: Record<number, string> = {};
+    let hasJustError = false;
+    selectedSDGs.forEach(entry => {
+      const text = sdgJustifications[entry.sdg_number] || '';
+      if (text.length > 0 && text.length < 30) {
+        newErrors[entry.sdg_number] = t('form.sdg_justification_min_error');
+        hasJustError = true;
+      }
+    });
+    if (hasJustError) {
+      setSdgErrors(newErrors);
+      return;
+    }
+
+    // Attach current justifications to sdgs array
+    const sdgsWithJustification: SDGEntry[] = selectedSDGs.map(entry => ({
+      sdg_number: entry.sdg_number,
+      justification: sdgJustifications[entry.sdg_number] || null,
+    }));
+
+    await onSubmit({
+      ...data,
+      sdgs: sdgsWithJustification,
+      captcha_token: captchaToken || undefined,
+    });
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,6 +176,8 @@ export default function ProjectForm({
   const SELECT_CLASSES = "input-uia appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_0.5rem_center] bg-[length:1.5em_1.5em] bg-no-repeat pr-10";
   const countries = watchedRegion ? countryList(watchedRegion) : [];
 
+  const effectiveSubmitLabel = submitLabel ?? t('form.submit_btn');
+
   return (
     <div className="max-w-4xl mx-auto">
       {submitError && (
@@ -134,14 +191,14 @@ export default function ProjectForm({
         {/* Contact Information */}
         <section>
           <h2 className="text-2xl font-display font-bold uppercase tracking-wider text-uia-blue mb-8 pb-3 border-b-2 border-uia-blue/10">
-            Contact Information
+            {t('form.section_contact')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">Organization Name</label>
+              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">{t('form.field_org')}</label>
               <input
                 type="text"
-                {...register('organization_name', { required: 'Organization name is required' })}
+                {...register('organization_name', { required: t('form.error_required') })}
                 className="input-uia"
                 placeholder="Name of your organization"
               />
@@ -149,10 +206,10 @@ export default function ProjectForm({
             </div>
 
             <div>
-              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">Contact Person</label>
+              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">{t('form.field_contact_person')}</label>
               <input
                 type="text"
-                {...register('contact_person', { required: 'Contact person is required' })}
+                {...register('contact_person', { required: t('form.error_required') })}
                 className="input-uia"
                 placeholder="First and Last Name"
               />
@@ -160,12 +217,12 @@ export default function ProjectForm({
             </div>
 
             <div className="md:col-span-2">
-              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">Contact Email</label>
+              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">{t('form.field_email')}</label>
               <input
                 type="email"
                 {...register('contact_email', {
-                  required: 'Email is required',
-                  pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Enter a valid email address' },
+                  required: t('form.error_required'),
+                  pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t('form.error_email') },
                 })}
                 className="input-uia"
                 placeholder="email@example.com"
@@ -178,14 +235,14 @@ export default function ProjectForm({
         {/* Project Basics */}
         <section>
           <h2 className="text-2xl font-display font-bold uppercase tracking-wider text-uia-blue mb-8 pb-3 border-b-2 border-uia-blue/10">
-            Project Details
+            {t('form.section_project')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="md:col-span-2">
-              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">Project Name</label>
+              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">{t('form.field_project_name')}</label>
               <input
                 type="text"
-                {...register('project_name', { required: 'Project name is required' })}
+                {...register('project_name', { required: t('form.error_required') })}
                 className="input-uia"
                 placeholder="Enter the project's full title"
               />
@@ -193,9 +250,9 @@ export default function ProjectForm({
             </div>
 
             <div className="md:col-span-2">
-              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">Project Status</label>
+              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">{t('form.field_project_status')}</label>
               <select
-                {...register('project_status', { required: 'Status is required' })}
+                {...register('project_status', { required: t('form.error_required') })}
                 className={SELECT_CLASSES}
               >
                 <option value="">Select Status</option>
@@ -211,16 +268,16 @@ export default function ProjectForm({
         {/* Location */}
         <section>
           <h2 className="text-2xl font-display font-bold uppercase tracking-wider text-uia-blue mb-8 pb-3 border-b-2 border-uia-blue/10">
-            Location
+            {t('form.section_location')}
           </h2>
           <p className="font-sans text-sm text-uia-dark/70 mb-6">
             Select your UIA region, then choose the country and type your project city. Coordinates will be assigned by UIA staff.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="md:col-span-2">
-              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">UIA Region</label>
+              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">{t('form.field_region')}</label>
               <select
-                {...register('uia_region', { required: 'Region is required' })}
+                {...register('uia_region', { required: t('form.error_required') })}
                 className={SELECT_CLASSES}
               >
                 <option value="">Select Region</option>
@@ -232,9 +289,9 @@ export default function ProjectForm({
             </div>
 
             <div>
-              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">Country</label>
+              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">{t('form.field_country')}</label>
               <select
-                {...register('country', { required: 'Country is required' })}
+                {...register('country', { required: t('form.error_required') })}
                 className={SELECT_CLASSES}
                 disabled={!watchedRegion}
               >
@@ -247,10 +304,10 @@ export default function ProjectForm({
             </div>
 
             <div>
-              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">City</label>
+              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">{t('form.field_city')}</label>
               <input
                 type="text"
-                {...register('city', { required: 'City is required' })}
+                {...register('city', { required: t('form.error_required') })}
                 className="input-uia"
                 placeholder="City name"
               />
@@ -262,15 +319,15 @@ export default function ProjectForm({
         {/* Description */}
         <section>
           <h2 className="text-2xl font-display font-bold uppercase tracking-wider text-uia-blue mb-8 pb-3 border-b-2 border-uia-blue/10">
-            Description
+            {t('form.section_description')}
           </h2>
           <div className="space-y-8">
             <div>
-              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">Brief Description (Summary)</label>
+              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">{t('form.field_brief')}</label>
               <textarea
                 rows={3}
                 {...register('brief_description', {
-                  required: 'Brief description is required',
+                  required: t('form.error_required'),
                   maxLength: { value: 100, message: 'Brief description must be 100 characters or fewer' },
                 })}
                 className="input-uia min-h-[100px]"
@@ -284,10 +341,10 @@ export default function ProjectForm({
             </div>
 
             <div>
-              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">Detailed Description</label>
+              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">{t('form.field_detailed')}</label>
               <textarea
                 rows={6}
-                {...register('detailed_description', { required: 'Detailed description is required' })}
+                {...register('detailed_description', { required: t('form.error_required') })}
                 className="input-uia min-h-[200px]"
                 placeholder="Provide a comprehensive description of the project"
               />
@@ -295,10 +352,10 @@ export default function ProjectForm({
             </div>
 
             <div>
-              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">Success Factors</label>
+              <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wide mb-2">{t('form.field_success')}</label>
               <textarea
                 rows={4}
-                {...register('success_factors', { required: 'Success factors are required' })}
+                {...register('success_factors', { required: t('form.error_required') })}
                 className="input-uia min-h-[150px]"
                 placeholder="What makes this project successful? (e.g. Community involvement, innovative technology...)"
               />
@@ -310,42 +367,86 @@ export default function ProjectForm({
         {/* SDGs */}
         <section>
           <h2 className="text-2xl font-display font-bold uppercase tracking-wider text-uia-blue mb-8 pb-3 border-b-2 border-uia-blue/10">
-            Sustainable Development Goals
+            {t('form.section_sdgs')}
           </h2>
-          <p className="font-sans text-sm text-uia-dark mb-6">Select all UN Sustainable Development Goals that apply to this project.</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {SDGS.map(sdg => (
-              <div
-                key={sdg.id}
-                onClick={() => toggleSDG(sdg.id)}
-                className={`cursor-pointer group flex flex-col items-center p-4 transition-all duration-200 border-2 ${selectedSDGs?.includes(sdg.id)
-                    ? 'border-uia-blue bg-uia-blue/5 scale-[1.02]'
-                    : 'border-transparent bg-uia-gray-light hover:bg-white hover:border-uia-dark/20'
-                }`}
-              >
+          <p className="font-sans text-sm text-uia-dark mb-6">{t('form.sdg_select_hint')}</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+            {SDGS.map(sdg => {
+              const selected = isSDGSelected(sdg.id);
+              return (
                 <div
-                  className="w-12 h-12 flex items-center justify-center text-white font-display font-bold text-xl shadow-sm mb-3"
-                  style={{ backgroundColor: sdg.color }}
+                  key={sdg.id}
+                  onClick={() => toggleSDG(sdg.id)}
+                  className={`cursor-pointer group flex flex-col items-center p-4 transition-all duration-200 border-2 ${selected
+                      ? 'border-uia-blue bg-uia-blue/5 scale-[1.02]'
+                      : 'border-transparent bg-uia-gray-light hover:bg-white hover:border-uia-dark/20'
+                  }`}
                 >
-                  {sdg.id}
+                  <div
+                    className="w-12 h-12 flex items-center justify-center text-white font-display font-bold text-xl shadow-sm mb-3"
+                    style={{ backgroundColor: sdg.color }}
+                  >
+                    {sdg.id}
+                  </div>
+                  <span className={`text-[10px] font-display font-bold uppercase text-center leading-tight tracking-tight ${selected ? 'text-uia-blue' : 'text-uia-dark'}`}>
+                    {t(`sdg_names.${sdg.id}`)}
+                  </span>
                 </div>
-                <span className={`text-[10px] font-display font-bold uppercase text-center leading-tight tracking-tight ${selectedSDGs?.includes(sdg.id) ? 'text-uia-blue' : 'text-uia-dark'}`}>
-                  {sdg.name}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
+
+          {/* Justification textareas for each selected SDG */}
+          {selectedSDGs.length > 0 && (
+            <div className="space-y-4 mt-6 border-t border-uia-blue/10 pt-6">
+              {selectedSDGs.map(entry => {
+                const sdg = SDGS.find(s => s.id === entry.sdg_number)!;
+                const text = sdgJustifications[entry.sdg_number] || '';
+                return (
+                  <div key={entry.sdg_number} className="bg-uia-gray-light/40 border border-uia-dark/10 p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div
+                        className="w-8 h-8 flex items-center justify-center text-white font-display font-bold text-sm flex-shrink-0"
+                        style={{ backgroundColor: sdg.color }}
+                      >
+                        {sdg.id}
+                      </div>
+                      <label className="font-display font-bold text-xs uppercase text-uia-dark tracking-wide">
+                        {t('form.sdg_justification_label', { sdg: sdg.id })}
+                      </label>
+                    </div>
+                    <textarea
+                      rows={2}
+                      maxLength={250}
+                      value={text}
+                      onChange={e => updateJustification(entry.sdg_number, e.target.value)}
+                      className="input-uia min-h-[70px] text-sm"
+                      placeholder={t('form.sdg_justification_placeholder')}
+                    />
+                    <div className="flex justify-between items-center mt-1">
+                      <span className="text-xs text-uia-red font-bold">
+                        {sdgErrors[entry.sdg_number] || ''}
+                      </span>
+                      <span className={`text-xs ${text.length >= 230 ? 'text-uia-red font-bold' : 'text-gray-400'}`}>
+                        {t('form.sdg_justification_counter', { count: text.length })}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* Categorization & Requirements */}
         <section>
           <h2 className="text-2xl font-display font-bold uppercase tracking-wider text-uia-blue mb-8 pb-3 border-b-2 border-uia-blue/10">
-            Categorization & Requirements
+            {t('form.section_typologies')} &amp; {t('form.section_requirements')}
           </h2>
           <div className="space-y-8">
             <div className="bg-uia-gray-light/30 p-6 md:p-8 border-l-5 border-uia-blue shadow-sm">
               <label className="block font-display font-bold text-sm uppercase text-uia-blue tracking-widest mb-6">
-                Project Typologies
+                {t('form.section_typologies')}
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4">
                 {TYPOLOGIES.map(type => (
@@ -375,7 +476,7 @@ export default function ProjectForm({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white p-6 border-l-5 border-uia-violet shadow-sm">
                 <label className="block font-display font-bold text-xs uppercase text-uia-violet tracking-wider mb-5 pb-2 border-b border-uia-violet/10">
-                  Funding Needs
+                  {t('form.field_funding_reqs')}
                 </label>
                 <div className="space-y-3.5">
                   {FUNDING_REQUIREMENTS.map(req => (
@@ -404,7 +505,7 @@ export default function ProjectForm({
 
               <div className="bg-white p-6 border-l-5 border-uia-dark shadow-sm">
                 <label className="block font-display font-bold text-xs uppercase text-uia-dark tracking-wider mb-5 pb-2 border-b border-uia-dark/10">
-                  Government Support
+                  {t('form.field_gov_reqs')}
                 </label>
                 <div className="space-y-3.5">
                   {GOVERNMENT_REQUIREMENTS.map(req => (
@@ -433,7 +534,7 @@ export default function ProjectForm({
 
               <div className="bg-white p-6 border-l-5 border-gray-400 shadow-sm">
                 <label className="block font-display font-bold text-xs uppercase text-gray-600 tracking-wider mb-5 pb-2 border-b border-gray-200">
-                  Other Support
+                  {t('form.field_other_reqs')}
                 </label>
                 <div className="space-y-3.5">
                   {OTHER_REQUIREMENTS.map(req => (
@@ -466,7 +567,7 @@ export default function ProjectForm({
         {/* Media */}
         <section>
           <h2 className="text-2xl font-display font-bold uppercase tracking-wider text-uia-blue mb-8 pb-3 border-b-2 border-uia-blue/10">
-            Project Images
+            {t('form.section_images')}
           </h2>
           <div className="space-y-6">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -508,7 +609,7 @@ export default function ProjectForm({
             </div>
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" multiple className="hidden" />
             <p className="font-sans text-xs text-uia-dark/60 italic">
-              Upload up to 5 high-quality images of your project. JPG, PNG or WebP, max 5MB each.
+              {t('form.field_images_hint')}
             </p>
           </div>
         </section>
@@ -517,7 +618,7 @@ export default function ProjectForm({
         {isPublicSubmission && (
           <section>
             <div className="border border-gray-200 rounded-lg p-6 bg-gray-50 space-y-4">
-              <h3 className="font-display font-bold text-lg uppercase tracking-wider text-uia-dark">Data Privacy & Consent</h3>
+              <h3 className="font-display font-bold text-lg uppercase tracking-wider text-uia-dark">{t('form.section_consent')}</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
                 By submitting this form, UIA (Union Internationale des Architectes) will collect, store and may publish
                 the information above for the Panorama SDG initiative. Data is processed in accordance with applicable
@@ -535,7 +636,7 @@ export default function ProjectForm({
                   rel="noopener noreferrer"
                   className="text-uia-blue underline hover:text-uia-violet transition-colors font-medium"
                 >
-                  Privacy Policy
+                  {t('form.gdpr_link')}
                 </a>
                 <a
                   href="https://www.uia-architectes.org/en/terms-of-use/"
@@ -549,12 +650,12 @@ export default function ProjectForm({
               <label className="flex items-start gap-3 cursor-pointer group pt-1">
                 <input
                   type="checkbox"
-                  {...register('gdpr_consent', { required: 'You must accept the terms to submit.' })}
+                  {...register('gdpr_consent', { required: t('form.error_gdpr') })}
                   className="mt-0.5 h-5 w-5 text-uia-blue border-gray-300 focus:ring-uia-blue rounded-none flex-shrink-0"
                 />
                 <span className="text-sm font-medium text-gray-800 group-hover:text-uia-blue transition-colors leading-relaxed">
-                  I have read and accept the Privacy Policy and Terms of Use, and I consent to UIA processing
-                  and publishing my project data as described above.
+                  {t('form.gdpr_label')}{' '}
+                  <a href="https://www.uia-architectes.org/en/privacy-policy/" target="_blank" rel="noopener noreferrer" className="underline">{t('form.gdpr_link')}</a>.
                 </span>
               </label>
               {errors.gdpr_consent && (
@@ -589,9 +690,9 @@ export default function ProjectForm({
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                Processing Submission...
+                Processing...
               </span>
-            ) : submitLabel}
+            ) : effectiveSubmitLabel}
           </button>
         </div>
       </form>

@@ -15,17 +15,20 @@ export const adminAPI = {
     return response.data;
   },
 
-  // Get all projects (filtered by status if needed)
+  // Get all projects (filtered by status, voted status, search)
   getAllProjects: async (
     page = 1,
     pageSize = 20,
-    workflowStatus?: string
+    workflowStatus?: string,
+    voted?: boolean | null,
+    search?: string
   ): Promise<PaginatedProjects> => {
-    let url = `/api/admin/all-projects?page=${page}&page_size=${pageSize}`;
-    if (workflowStatus) {
-      url += `&workflow_status=${workflowStatus}`;
-    }
-    const response = await apiClient.get(url);
+    const params: Record<string, string | number> = { page, page_size: pageSize };
+    if (workflowStatus) params.workflow_status = workflowStatus;
+    if (voted === true) params.voted = 'true';
+    if (voted === false) params.voted = 'false';
+    if (search) params.search = search;
+    const response = await apiClient.get('/api/admin/all-projects', { params });
     return response.data;
   },
 
@@ -60,5 +63,13 @@ export const adminAPI = {
   // Delete project
   deleteProject: async (projectId: string): Promise<void> => {
     await apiClient.delete(`/api/admin/projects/${projectId}`);
+  },
+
+  // Record admin SDG vote (exactly 3 SDGs)
+  voteSDGs: async (projectId: string, sdgNumbers: number[]): Promise<Project> => {
+    const response = await apiClient.post(`/api/admin/projects/${projectId}/vote`, {
+      sdg_numbers: sdgNumbers,
+    });
+    return response.data;
   },
 };

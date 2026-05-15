@@ -27,8 +27,8 @@ echo "Uploading images from $IMAGE_DIR to MinIO bucket '$BUCKET'..."
 MC="docker run --rm --network $NETWORK minio/mc"
 
 $MC alias set $MINIO_ALIAS http://minio:9000 \
-  "${MINIO_ROOT_USER:-atlas_minio}" \
-  "${MINIO_ROOT_PASSWORD:-atlas_minio_pass}"
+  "${MINIO_ROOT_USER:-minioadmin}" \
+  "${MINIO_ROOT_PASSWORD:-minioadmin}"
 
 $MC mb --ignore-existing "$MINIO_ALIAS/$BUCKET"
 $MC anonymous set public "$MINIO_ALIAS/$BUCKET"

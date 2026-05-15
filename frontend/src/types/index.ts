@@ -55,6 +55,11 @@ export interface SDGInfo {
   color: string;
 }
 
+export interface SDGEntry {
+  sdg_number: number;
+  justification?: string | null;
+}
+
 export interface Project {
   id: string;
   projectName: string;
@@ -80,8 +85,13 @@ export interface Project {
   otherFundingText?: string;
   otherGovText?: string;
   authors?: string;
-  sdgs: SDG[];
+  sdgs: SDGEntry[];
   imageUrls: string[];
+  rejectionReason?: string;
+  reviewerNotes?: string;
+  adminVoteSdgs?: number[];
+  adminVotedAt?: string;
+  adminVotedBy?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -108,7 +118,7 @@ export interface ProjectSubmission {
   other_typology_text?: string;
   other_funding_text?: string;
   other_gov_text?: string;
-  sdgs: SDG[];
+  sdgs: SDGEntry[];
   imageUrls: string[];
 }
 

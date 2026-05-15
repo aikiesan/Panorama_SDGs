@@ -1,5 +1,10 @@
 import { apiClient } from './client';
 
+export interface SDGEntry {
+  sdg_number: number;
+  justification?: string | null;
+}
+
 export interface ProjectCreate {
   project_name: string;
   organization_name: string;
@@ -22,7 +27,7 @@ export interface ProjectCreate {
   other_typology_text?: string;
   other_funding_text?: string;
   other_gov_text?: string;
-  sdgs: number[];
+  sdgs: SDGEntry[];
   image_urls: string[];
   captcha_token?: string;
   gdpr_consent: boolean;

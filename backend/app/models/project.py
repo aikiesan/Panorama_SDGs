@@ -85,6 +85,13 @@ class Project(Base):
     # Architect(s) / authors (populated from UIA Guidebook data)
     authors = Column(Text, nullable=True)
 
+    # Admin SDG vote (3 SDGs chosen by admin as most representative)
+    admin_vote_sdg_1 = Column(Integer, nullable=True)
+    admin_vote_sdg_2 = Column(Integer, nullable=True)
+    admin_vote_sdg_3 = Column(Integer, nullable=True)
+    admin_voted_at = Column(DateTime, nullable=True)
+    admin_voted_by = Column(String(255), nullable=True)  # admin email
+
     # Review/moderation
     rejection_reason = Column(Text, nullable=True)
     reviewer_notes = Column(Text, nullable=True)
@@ -120,6 +127,7 @@ class ProjectSDG(Base):
     id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
     project_id = Column(Uuid(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
     sdg_number = Column(Integer, nullable=False, index=True)  # 1-17
+    justification = Column(Text, nullable=True)  # submitter's explanation (~180-250 chars)
 
     project = relationship("Project", back_populates="sdgs")
 

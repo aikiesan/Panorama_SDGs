@@ -1,4 +1,7 @@
+import { useTranslation } from 'react-i18next';
+
 export default function Footer() {
+  const { t } = useTranslation();
   return (
     <footer className="bg-uia-gray-light text-uia-dark border-t border-uia-dark">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -8,10 +11,7 @@ export default function Footer() {
           {/* LEFT COLUMN: Membership CTA + Legal Links */}
           <div className="space-y-4">
             <p className="text-sm font-sans text-uia-dark leading-relaxed">
-              Join the professional network that unites 124 countries and territories.
-              If your professional organisation represents the majority of qualified architects
-              licensed to practice in your country, and if it is not yet a member of the UIA,
-              your organisation can apply for UIA membership.
+              {t('footer.membership_text')}
             </p>
             <div className="flex items-center gap-3 text-xs font-sans">
               <a
@@ -20,7 +20,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="hover:text-uia-red transition-colors"
               >
-                Privacy Policy
+                {t('footer.privacy_policy')}
               </a>
               <span className="text-uia-dark">|</span>
               <a
@@ -29,7 +29,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="hover:text-uia-red transition-colors"
               >
-                Terms of Use
+                {t('footer.terms_of_use')}
               </a>
             </div>
           </div>
@@ -42,7 +42,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="block w-full px-4 py-3 bg-white border border-uia-dark text-center font-display font-semibold text-sm uppercase tracking-uia-wide text-uia-dark hover:bg-uia-dark-button hover:text-white hover:border-uia-dark-button transition-all duration-200 rounded-none"
             >
-              Join us
+              {t('footer.join_us')}
             </a>
             <a
               href="https://www.uia-architectes.org/en/work-programmes/"
@@ -50,7 +50,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="block w-full px-4 py-3 bg-white border border-uia-dark text-center font-display font-semibold text-sm uppercase tracking-uia-wide text-uia-dark hover:bg-uia-dark-button hover:text-white hover:border-uia-dark-button transition-all duration-200 rounded-none"
             >
-              Join a Work Programme
+              {t('footer.join_work_programme')}
             </a>
             <a
               href="https://www.uia-architectes.org/en/commissions/"
@@ -58,7 +58,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="block w-full px-4 py-3 bg-white border border-uia-dark text-center font-display font-semibold text-sm uppercase tracking-uia-wide text-uia-dark hover:bg-uia-dark-button hover:text-white hover:border-uia-dark-button transition-all duration-200 rounded-none"
             >
-              Join a Commission
+              {t('footer.join_commission')}
             </a>
             <a
               href="https://www.uia-architectes.org/en/commission/validation/"
@@ -66,14 +66,14 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="block w-full px-4 py-3 bg-white border border-uia-dark text-center font-display font-semibold text-sm uppercase tracking-uia-wide text-uia-dark hover:bg-uia-dark-button hover:text-white hover:border-uia-dark-button transition-all duration-200 rounded-none"
             >
-              Validate your architecture school
+              {t('footer.validate_school')}
             </a>
           </div>
 
           {/* RIGHT COLUMN: Social Media Links */}
           <div>
             <h4 className="text-uia-blue font-display font-bold text-sm mb-4 uppercase tracking-uia-wide">
-              Follow UIA
+              {t('footer.follow_uia')}
             </h4>
             <div className="space-y-2">
               <a
@@ -138,7 +138,7 @@ export default function Footer() {
         {/* Bottom Copyright Bar */}
         <div className="pt-8 border-t border-uia-dark text-center">
           <p className="text-sm font-sans text-uia-dark">
-            © 2026 - International Union of Architects
+            © 2026 - International Union of Architects — {t('footer.rights')}
           </p>
         </div>
       </div>

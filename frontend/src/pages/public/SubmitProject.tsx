@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { projectsApi, type ProjectCreate } from '../../services/api/projects';
 import ProjectForm from '../../components/forms/ProjectForm';
 import { REGION_CODE_FROM_LABEL } from '../../data/countriesByRegion';
 import { Button } from '../../components/uia';
 
 export default function SubmitProject() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const editToken = searchParams.get('edit_token');
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -50,7 +52,7 @@ export default function SubmitProject() {
       });
     } catch (err: any) {
       console.error('Error loading project:', err);
-      setSubmitError("Invalid or expired edit link. Please check the URL.");
+      setSubmitError(t('submit.error_invalid_token'));
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +72,7 @@ export default function SubmitProject() {
       window.scrollTo(0, 0);
     } catch (err: any) {
       console.error('Submission error:', err);
-      setSubmitError(err.response?.data?.detail || 'An error occurred while submitting the project.');
+      setSubmitError(err.response?.data?.detail || t('submit.error_generic'));
       window.scrollTo(0, 0);
     } finally {
       setIsSubmitting(false);
@@ -86,7 +88,7 @@ export default function SubmitProject() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center text-black">
-        <div className="font-sans text-uia-dark">Loading project data...</div>
+        <div className="font-sans text-uia-dark">{t('submit.loading')}</div>
       </div>
     );
   }
@@ -101,18 +103,15 @@ export default function SubmitProject() {
             </svg>
           </div>
           <h2 className="text-2xl font-display font-bold text-black mb-2">
-            {editToken ? 'Update Received' : 'Submission Received'}
+            {editToken ? t('submit.update_received') : t('submit.success_title')}
           </h2>
           <p className="text-uia-dark font-sans mb-8">
-            {editToken
-              ? 'Your project updates have been submitted for re-review.'
-              : 'Thank you for contributing to Panorama SDG. Your project has been submitted for review by UIA experts.'}
-            {' '}You will be notified once it is published.
+            {editToken ? t('submit.update_message') : t('submit.success_message')}
           </p>
           <div className="flex flex-col space-y-3">
             <Link to="/dashboard">
               <Button variant="dark" className="w-full">
-                View Panorama
+                {t('submit.view_btn')}
               </Button>
             </Link>
             {!editToken && (
@@ -121,7 +120,7 @@ export default function SubmitProject() {
                 onClick={handleReset}
                 className="w-full"
               >
-                Submit Another Project
+                {t('submit.another_btn')}
               </Button>
             )}
           </div>
@@ -135,12 +134,10 @@ export default function SubmitProject() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-display font-bold text-black tracking-uia-normal">
-            {editToken ? 'Update Project' : 'Submit a Project'}
+            {editToken ? t('submit.update_title') : t('submit.page_title')}
           </h1>
           <p className="mt-2 text-uia-dark font-sans">
-            {editToken
-              ? 'Make necessary changes to your project submission below.'
-              : 'Share your sustainable development project with the global community. All submissions are reviewed by UIA experts before publication.'}
+            {editToken ? t('submit.update_subtitle') : t('submit.page_subtitle')}
           </p>
         </div>
 
@@ -149,8 +146,8 @@ export default function SubmitProject() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           submitError={submitError}
-          isPublicSubmission={!editToken} // Only require checks if not editing via token
-          submitLabel={editToken ? 'Update Project' : 'Submit Project'}
+          isPublicSubmission={!editToken}
+          submitLabel={editToken ? t('form.save_btn') : t('form.submit_btn')}
         />
       </div>
     </div>

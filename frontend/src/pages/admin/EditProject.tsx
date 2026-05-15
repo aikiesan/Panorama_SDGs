@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminAPI } from '../../services/api/admin';
+import { LanguageToggle } from '../../components/layout/Header';
 import type { ProjectCreate } from '../../services/api/projects';
 import ProjectForm from '../../components/forms/ProjectForm';
 import { REGION_CODE_FROM_LABEL } from '../../data/countriesByRegion';
@@ -8,6 +10,7 @@ import { REGION_CODE_FROM_LABEL } from '../../data/countriesByRegion';
 export default function EditProject() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -103,8 +106,8 @@ export default function EditProject() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-mapbox-black flex items-center justify-center text-white">
-        Loading...
+      <div className="min-h-screen bg-mapbox-black flex items-center justify-center text-mapbox-light">
+        <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -114,11 +117,12 @@ export default function EditProject() {
       {/* Header */}
       <div className="bg-mapbox-card border-b border-mapbox-border px-6 py-4 sticky top-0 z-30 flex justify-between items-center">
         <div className="flex items-center space-x-4">
-          <Link to={`/admin/projects/${projectId}`} className="text-mapbox-gray hover:text-white transition-colors">
-            ← Cancel
+          <Link to={`/admin/projects/${projectId}`} className="text-mapbox-gray hover:text-mapbox-light transition-colors">
+            ← {t('admin.modal_cancel')}
           </Link>
-          <h1 className="text-xl font-bold text-white">Edit Project</h1>
+          <h1 className="text-xl font-bold text-mapbox-light">{t('admin.review_edit')}</h1>
         </div>
+        <LanguageToggle />
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
@@ -128,7 +132,7 @@ export default function EditProject() {
           isSubmitting={isSubmitting}
           submitError={submitError}
           isPublicSubmission={false}
-          submitLabel="Save Changes"
+          submitLabel={t('form.save_btn')}
         />
       </div>
     </div>

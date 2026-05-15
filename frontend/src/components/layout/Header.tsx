@@ -1,8 +1,33 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ASSETS } from '../../utils/assets';
 import { Button } from '../uia';
 
+export function LanguageToggle({ className = '' }: { className?: string }) {
+  const { i18n } = useTranslation();
+  const lang = i18n.language?.startsWith('fr') ? 'fr' : 'en';
+
+  const toggle = () => i18n.changeLanguage(lang === 'en' ? 'fr' : 'en');
+
+  return (
+    <button
+      onClick={toggle}
+      className={`flex items-center gap-0 rounded-full border border-uia-dark overflow-hidden text-xs font-display font-bold uppercase tracking-uia-wide ${className}`}
+      aria-label="Toggle language"
+    >
+      <span className={`px-3 py-1.5 transition-colors ${lang === 'en' ? 'bg-uia-blue text-white' : 'bg-white text-uia-dark hover:bg-uia-gray-light'}`}>
+        EN
+      </span>
+      <span className={`px-3 py-1.5 transition-colors ${lang === 'fr' ? 'bg-uia-blue text-white' : 'bg-white text-uia-dark hover:bg-uia-gray-light'}`}>
+        FR
+      </span>
+    </button>
+  );
+}
+
 export default function Header() {
+  const { t } = useTranslation();
+
   return (
     <header className="bg-mapbox-black border-b border-mapbox-border">
       <div className="max-w-7xl mx-auto px-6">
@@ -30,33 +55,34 @@ export default function Header() {
               to="/"
               className="text-sm font-medium text-uia-dark hover:text-uia-red transition-colors"
             >
-              Home
+              {t('nav.home')}
             </Link>
             <Link
               to="/dashboard"
               className="text-sm font-medium text-uia-dark hover:text-uia-red transition-colors"
             >
-              Panorama
+              {t('nav.explore')}
             </Link>
             <Link
               to="/submit"
               className="text-sm font-medium text-uia-dark hover:text-uia-red transition-colors"
             >
-              Submit Project
+              {t('nav.submit')}
             </Link>
           </nav>
 
-          {/* CTA Button */}
-          <div className="flex items-center space-x-4">
+          {/* Right side: language toggle + admin + submit CTA */}
+          <div className="flex items-center space-x-3">
+            <LanguageToggle />
             <Link
               to="/admin"
               className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-uia-dark hover:text-uia-red transition-colors"
             >
-              Admin
+              {t('nav.admin')}
             </Link>
             <Link to="/submit">
               <Button variant="dark" size="sm">
-                Submit Project
+                {t('nav.submit')}
               </Button>
             </Link>
           </div>

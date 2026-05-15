@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button, Card } from '../../components/uia';
 import { dashboardAPI } from '../../services/api/dashboardAPI';
 import AnimatedCounter from '../../components/common/AnimatedCounter';
 
 export default function LandingPage() {
+  const { t } = useTranslation();
   const [totalProjects, setTotalProjects] = useState(311);
 
   useEffect(() => {
@@ -56,11 +58,11 @@ export default function LandingPage() {
 
             {/* Subtitle */}
             <p className="text-xl sm:text-2xl font-sans font-light text-white max-w-3xl mx-auto leading-relaxed mb-4 drop-shadow-lg">
-              The UIA Panorama of SDG Implementation Metrics — tracking how architecture drives the UN 2030 Agenda.
+              {t('landing.hero_desc1')}
             </p>
 
             <p className="text-lg font-sans text-white/90 max-w-2xl mx-auto mb-12 drop-shadow-lg">
-              Featuring projects from the UIA Guidebook for the 2030 Agenda — 2023 &amp; 2026 editions — across 5 global regions.
+              {t('landing.hero_desc2')}
             </p>
 
             {/* CTA Buttons - UIA Style */}
@@ -68,7 +70,7 @@ export default function LandingPage() {
               <Link to="/dashboard">
                 <Button variant="dark" size="lg" className="min-w-[200px]">
                   <span className="flex items-center justify-center gap-2">
-                    See the Projects
+                    {t('landing.see_projects')}
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
@@ -79,7 +81,7 @@ export default function LandingPage() {
               <Link to="/submit">
                 <Button variant="dark-outline" size="lg" className="min-w-[200px] border-2 border-white text-white hover:bg-white hover:text-uia-dark-button">
                   <span className="flex items-center justify-center gap-2">
-                    Submit Project
+                    {t('landing.submit_btn')}
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
@@ -99,19 +101,19 @@ export default function LandingPage() {
               <div className="text-5xl font-display font-bold text-uia-red mb-2 group-hover:scale-110 transition-transform">
                 <AnimatedCounter value={totalProjects} />
               </div>
-              <div className="text-xs font-display font-bold text-uia-dark uppercase tracking-uia-wide">Projects</div>
+              <div className="text-xs font-display font-bold text-uia-dark uppercase tracking-uia-wide">{t('landing.kpi_projects')}</div>
             </div>
             <div className="py-10 px-8 text-center group cursor-pointer hover:bg-uia-gray-light transition-all duration-300">
               <div className="text-5xl font-display font-bold text-uia-blue mb-2 group-hover:scale-110 transition-transform">17</div>
-              <div className="text-xs font-display font-bold text-uia-dark uppercase tracking-uia-wide">SDG Goals</div>
+              <div className="text-xs font-display font-bold text-uia-dark uppercase tracking-uia-wide">{t('landing.kpi_sdgs')}</div>
             </div>
             <div className="py-10 px-8 text-center group cursor-pointer hover:bg-uia-gray-light transition-all duration-300">
               <div className="text-5xl font-display font-bold text-uia-violet mb-2 group-hover:scale-110 transition-transform">5</div>
-              <div className="text-xs font-display font-bold text-uia-dark uppercase tracking-uia-wide">Global Regions</div>
+              <div className="text-xs font-display font-bold text-uia-dark uppercase tracking-uia-wide">{t('landing.kpi_regions')}</div>
             </div>
             <div className="py-10 px-8 text-center group cursor-pointer hover:bg-uia-gray-light transition-all duration-300">
               <div className="text-5xl font-display font-bold text-uia-red mb-2 group-hover:scale-110 transition-transform">2030</div>
-              <div className="text-xs font-display font-bold text-uia-dark uppercase tracking-uia-wide">Target Year</div>
+              <div className="text-xs font-display font-bold text-uia-dark uppercase tracking-uia-wide">{t('landing.kpi_target')}</div>
             </div>
           </div>
         </div>
@@ -123,13 +125,10 @@ export default function LandingPage() {
           {/* Section Header */}
           <div className="max-w-3xl mx-auto text-center mb-20">
             <h2 className="text-4xl sm:text-5xl font-display font-bold text-black mb-6 tracking-uia-normal">
-              Architecture for a{' '}
-              <span className="text-uia-blue">
-                Better Future
-              </span>
+              {t('landing.mission_title')}
             </h2>
             <p className="text-xl font-sans font-light text-uia-dark leading-relaxed">
-              Connecting the global architectural community to share knowledge, track progress, and inspire sustainable solutions.
+              {t('landing.mission_desc')}
             </p>
           </div>
 
@@ -143,9 +142,9 @@ export default function LandingPage() {
                 </svg>
               </div>
 
-              <h3 className="text-xl font-display font-bold text-black mb-3 group-hover:text-uia-blue transition-colors">Global Visibility</h3>
+              <h3 className="text-xl font-display font-bold text-black mb-3 group-hover:text-uia-blue transition-colors">{t('landing.feature_visibility_title')}</h3>
               <p className="text-base font-sans text-uia-dark leading-relaxed">
-                Showcase your sustainable projects on a world-class platform, reaching peers and policymakers worldwide.
+                {t('landing.feature_visibility_desc')}
               </p>
             </Card>
 
@@ -157,9 +156,9 @@ export default function LandingPage() {
                 </svg>
               </div>
 
-              <h3 className="text-xl font-display font-bold text-black mb-3 group-hover:text-uia-violet transition-colors">Impact Tracking</h3>
+              <h3 className="text-xl font-display font-bold text-black mb-3 group-hover:text-uia-violet transition-colors">{t('landing.feature_guidance_title')}</h3>
               <p className="text-base font-sans text-uia-dark leading-relaxed">
-                Quantify architectural contributions to the UN SDGs with real-time data visualization and analytics.
+                {t('landing.feature_guidance_desc')}
               </p>
             </Card>
 
@@ -171,9 +170,9 @@ export default function LandingPage() {
                 </svg>
               </div>
 
-              <h3 className="text-xl font-display font-bold text-black mb-3 group-hover:text-uia-red transition-colors">Knowledge Exchange</h3>
+              <h3 className="text-xl font-display font-bold text-black mb-3 group-hover:text-uia-red transition-colors">{t('landing.feature_progress_title')}</h3>
               <p className="text-base font-sans text-uia-dark leading-relaxed">
-                Access a library of proven solutions to accelerate the transition to a sustainable built environment.
+                {t('landing.feature_progress_desc')}
               </p>
             </Card>
           </div>
@@ -184,17 +183,17 @@ export default function LandingPage() {
       <section className="relative py-28 bg-uia-blue overflow-hidden">
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
           <h2 className="text-4xl sm:text-5xl font-display font-bold text-white mb-6 tracking-uia-normal">
-            Ready to Make an Impact?
+            {t('landing.cta_title')}
           </h2>
           <p className="text-xl font-sans font-light text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Join architects worldwide in building a sustainable future. Submit your project to Panorama SDG today.
+            {t('landing.cta_desc')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-5 justify-center">
             <Link to="/submit">
               <Button variant="dark" size="lg" className="min-w-[200px]">
                 <span className="flex items-center justify-center gap-2">
-                  Submit Your Project
+                  {t('landing.cta_btn')}
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
@@ -204,7 +203,7 @@ export default function LandingPage() {
 
             <Link to="/dashboard">
               <Button variant="dark-outline" size="lg" className="border-2 border-white text-white hover:bg-white hover:text-uia-dark-button min-w-[200px]">
-                See the Projects
+                {t('landing.see_projects')}
               </Button>
             </Link>
           </div>

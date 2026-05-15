@@ -3,6 +3,12 @@ from typing import List, Optional
 from datetime import datetime
 from uuid import UUID
 
+
+class SDGEntry(BaseModel):
+    """A single SDG selection with optional submitter justification"""
+    sdg_number: int
+    justification: Optional[str] = None
+
 _STATUS_MAP = {
     "planned": "PLANNED",
     "in_progress": "IN_PROGRESS",
@@ -63,7 +69,7 @@ class ProjectBase(BaseModel):
     other_funding_text: Optional[str] = None
     other_gov_text: Optional[str] = None
     authors: Optional[str] = None
-    sdgs: List[int]  # 1-17
+    sdgs: List[SDGEntry]  # list of {sdg_number, justification}
     image_urls: List[str]
     gdpr_consent: bool
 
@@ -100,8 +106,8 @@ class ProjectBase(BaseModel):
     @field_validator('sdgs')
     @classmethod
     def validate_sdgs(cls, v):
-        for sdg in v:
-            if sdg < 1 or sdg > 17:
+        for entry in v:
+            if entry.sdg_number < 1 or entry.sdg_number > 17:
                 raise ValueError('SDG numbers must be between 1 and 17')
         return v
 
@@ -143,7 +149,7 @@ class ProjectUpdate(BaseModel):
     other_funding_text: Optional[str] = None
     other_gov_text: Optional[str] = None
     authors: Optional[str] = None
-    sdgs: Optional[List[int]] = None
+    sdgs: Optional[List[SDGEntry]] = None
     image_urls: Optional[List[str]] = None
     rejection_reason: Optional[str] = None
     reviewer_notes: Optional[str] = None
@@ -175,6 +181,9 @@ class ProjectResponse(ProjectBase):
     workflow_status: str
     rejection_reason: Optional[str] = None
     reviewer_notes: Optional[str] = None
+    admin_vote_sdgs: Optional[List[int]] = None  # derived from 3 vote columns
+    admin_voted_at: Optional[datetime] = None
+    admin_voted_by: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -202,3 +211,20 @@ class FilterOptions(BaseModel):
     sdg: Optional[int] = None
     city: Optional[str] = None
     funded_by: Optional[str] = None
+
+
+class AdminVotePayload(BaseModel):
+    """Payload for admin SDG vote (exactly 3 SDGs)"""
+    sdg_numbers: List[int]
+
+    @field_validator('sdg_numbers')
+    @classmethod
+    def validate_vote(cls, v):
+        if len(v) != 3:
+            raise ValueError('Exactly 3 SDGs must be selected for a vote')
+        for sdg in v:
+            if sdg < 1 or sdg > 17:
+                raise ValueError('SDG numbers must be between 1 and 17')
+        if len(set(v)) != 3:
+            raise ValueError('SDG selections must be unique')
+        return v

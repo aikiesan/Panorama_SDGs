@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl, ZoomControl } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { useSearchParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { LanguageToggle } from '../../components/layout/Header';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { dashboardAPI } from '../../services/api/dashboardAPI';
@@ -110,6 +112,7 @@ function MapUpdater({ markers }: { markers: MapMarker[] }) {
 }
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [kpis, setKpis] = useState<DashboardKPIs>({
     totalProjects: 0,
@@ -250,7 +253,7 @@ export default function Dashboard() {
   // ─── Region legend (inside map) ───
   const RegionLegend = (
     <div className="absolute bottom-8 left-4 z-[1000] bg-white/95 backdrop-blur-sm shadow-lg rounded-lg p-3 border border-gray-200 min-w-[210px]">
-      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">UIA Sections</p>
+      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">{t('dashboard.region_sections')}</p>
       <div className="space-y-1.5">
         {Object.entries(REGION_LABELS).map(([region, label]) => (
           <button
@@ -269,25 +272,25 @@ export default function Dashboard() {
             onClick={() => setFilters((f) => ({ ...f, region: 'All Regions' }))}
             className="text-[10px] text-gray-400 hover:text-gray-600 w-full text-center pt-1 border-t border-gray-100 mt-1"
           >
-            Clear ×
+            {t('dashboard.clear_x')}
           </button>
         )}
       </div>
       {/* Edition style key */}
       <div className="mt-2 pt-2 border-t border-gray-100 space-y-1">
-        <p className="text-[9px] font-bold text-gray-300 uppercase tracking-wider">Edition</p>
+        <p className="text-[9px] font-bold text-gray-300 uppercase tracking-wider">{t('dashboard.edition_label')}</p>
         <div className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full bg-uia-blue border-2 border-white shadow-sm flex-shrink-0" />
-          <span className="text-[10px] text-gray-500">2026 Selected</span>
+          <span className="text-[10px] text-gray-500">{t('dashboard.selected_2026')}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full bg-uia-blue flex-shrink-0" style={{ border: '2px dashed rgba(255,255,255,0.85)', outline: '1px solid #577CB3', opacity: 0.88 }} />
-          <span className="text-[10px] text-gray-500">2023 Selected</span>
+          <span className="text-[10px] text-gray-500">{t('dashboard.selected_2023')}</span>
         </div>
         {filters.showSubmissions && (
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-full bg-gray-400 flex-shrink-0" style={{ border: '1.5px dashed white', opacity: 0.7 }} />
-            <span className="text-[10px] text-gray-400">Submitted</span>
+            <span className="text-[10px] text-gray-400">{t('dashboard.submitted_marker')}</span>
           </div>
         )}
       </div>
@@ -343,7 +346,7 @@ export default function Dashboard() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span className="hidden sm:inline">Map</span>
+              <span className="hidden sm:inline">{t('dashboard.view_map')}</span>
             </button>
             <button
               onClick={() => setViewMode('table')}
@@ -355,7 +358,7 @@ export default function Dashboard() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
               </svg>
-              <span className="hidden sm:inline">List</span>
+              <span className="hidden sm:inline">{t('dashboard.view_list')}</span>
             </button>
             <button
               onClick={() => setViewMode('analytics')}
@@ -367,9 +370,10 @@ export default function Dashboard() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
-              <span className="hidden sm:inline">Analytics</span>
+              <span className="hidden sm:inline">{t('dashboard.view_analytics')}</span>
             </button>
           </div>
+          <LanguageToggle className="ml-2" />
         </div>
       </header>
 
@@ -396,19 +400,19 @@ export default function Dashboard() {
           {/* KPI compact grid */}
           <div className="flex-shrink-0 p-4 border-b border-gray-100 grid grid-cols-3 gap-3">
             <div>
-              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Projects</div>
+              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t('dashboard.kpi_total')}</div>
               <div className="text-2xl font-display font-bold text-uia-blue">
                 <AnimatedCounter value={kpis.totalProjects} />
               </div>
             </div>
             <div>
-              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Cities</div>
+              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t('dashboard.kpi_cities')}</div>
               <div className="text-2xl font-display font-bold text-uia-violet">
                 <AnimatedCounter value={kpis.citiesEngaged} />
               </div>
             </div>
             <div>
-              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Countries</div>
+              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t('dashboard.kpi_countries')}</div>
               <div className="text-2xl font-display font-bold text-uia-blue">
                 <AnimatedCounter value={kpis.countriesRepresented} />
               </div>
@@ -417,13 +421,13 @@ export default function Dashboard() {
 
           {/* Filters header */}
           <div className="flex-shrink-0 px-4 py-2.5 border-b border-gray-100 flex items-center justify-between">
-            <h2 className="text-xs font-display font-bold text-gray-500 uppercase tracking-wider">Filters</h2>
+            <h2 className="text-xs font-display font-bold text-gray-500 uppercase tracking-wider">{t('dashboard.filters')}</h2>
             <div className="flex items-center gap-3">
               <button
                 onClick={handleClearFilters}
                 className="text-xs text-uia-blue hover:text-uia-red transition-colors font-medium"
               >
-                Reset
+                {t('dashboard.reset')}
               </button>
               {isMobile && (
                 <button
@@ -455,12 +459,12 @@ export default function Dashboard() {
               </div>
               <div className="min-w-0">
                 <div className="text-xs font-display font-bold text-gray-600 uppercase tracking-wide leading-tight">
-                  Submitted (non-selected)
+                  {t('dashboard.submitted_toggle')}
                 </div>
                 <div className="text-[10px] text-gray-400 leading-tight">
                   {communityMarkers.length > 0
                     ? `${communityMarkers.length} projects · 2023 & 2026`
-                    : '2023 & 2026 non-selected'}
+                    : t('dashboard.submitted_toggle_desc')}
                 </div>
               </div>
             </label>
@@ -493,9 +497,11 @@ export default function Dashboard() {
 
           {/* Footer: visible count */}
           <div className="flex-shrink-0 px-4 py-2.5 border-t border-gray-100 bg-gray-50/80 text-xs text-gray-500">
-            {loading ? 'Loading…' : viewMode === 'map'
-              ? `${guidebookMarkers.length} selected${filters.showSubmissions && communityMarkers.length > 0 ? ` + ${communityMarkers.length} submitted` : ''} on map`
-              : 'Use Map view to see markers'}
+            {loading ? t('dashboard.loading') : viewMode === 'map'
+              ? (filters.showSubmissions && communityMarkers.length > 0
+                  ? t('dashboard.map_selected_with_submitted', { selected: guidebookMarkers.length, submitted: communityMarkers.length })
+                  : t('dashboard.map_selected', { count: guidebookMarkers.length }))
+              : t('dashboard.use_map_view')}
           </div>
         </aside>
 
@@ -585,7 +591,7 @@ export default function Dashboard() {
                               onClick={() => handleProjectSelect(marker.id)}
                               className="text-xs font-medium text-uia-blue hover:text-uia-red hover:underline transition-colors ml-auto"
                             >
-                              View Details →
+                              {t('dashboard.view_details')}
                             </button>
                           </div>
                         </div>
@@ -634,9 +640,9 @@ export default function Dashboard() {
                         <div className="bg-white overflow-hidden text-gray-900 rounded-lg shadow-sm">
                           <div className="h-10 bg-gray-100 flex items-center justify-center gap-1.5">
                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                              Submitted
+                              {t('dashboard.submitted_marker')}
                             </span>
-                            <span className="text-[9px] text-gray-300 font-medium">— not selected</span>
+                            <span className="text-[9px] text-gray-300 font-medium">{t('dashboard.not_selected')}</span>
                           </div>
                           <div className="p-3">
                             <h3 className="font-bold text-sm leading-snug mb-1 text-gray-900 line-clamp-2">
@@ -653,7 +659,7 @@ export default function Dashboard() {
                               onClick={() => handleProjectSelect(marker.id)}
                               className="text-xs font-medium text-gray-500 hover:text-uia-blue hover:underline transition-colors"
                             >
-                              View Details →
+                              {t('dashboard.view_details')}
                             </button>
                           </div>
                         </div>
@@ -677,11 +683,11 @@ export default function Dashboard() {
           {viewMode === 'map' && !loading && markers.length === 0 && (
             <EmptyState
               icon="🌍"
-              title="No Projects Found"
-              description="No projects match your current filters. Try adjusting your criteria or clearing all filters."
-              actionLabel="Clear All Filters"
+              title={t('dashboard.no_projects_title')}
+              description={t('dashboard.no_projects_desc')}
+              actionLabel={t('dashboard.clear_filters')}
               onAction={handleClearFilters}
-              secondaryActionLabel="View All Projects"
+              secondaryActionLabel={t('dashboard.view_all')}
               onSecondaryAction={() => { handleClearFilters(); setViewMode('table'); }}
             />
           )}
@@ -690,7 +696,7 @@ export default function Dashboard() {
             <div className="absolute inset-0 flex items-center justify-center z-20 bg-white/60 backdrop-blur-sm pointer-events-none">
               <div className="bg-white px-8 py-6 rounded-2xl shadow-2xl shadow-black/10 flex flex-col items-center gap-4 pointer-events-auto">
                 <div className="w-12 h-12 border-4 border-uia-blue/20 border-t-uia-blue rounded-full animate-spin" />
-                <p className="text-gray-600 font-medium text-sm">Loading project data…</p>
+                <p className="text-gray-600 font-medium text-sm">{t('dashboard.loading')}</p>
               </div>
             </div>
           )}

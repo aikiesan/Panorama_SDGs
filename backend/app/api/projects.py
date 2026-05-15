@@ -120,8 +120,12 @@ async def submit_project(request: Request, project_data: ProjectCreate, db: Sess
     db.flush()  # Get the project ID
 
     # Add SDGs
-    for sdg_number in project_data.sdgs:
-        sdg = ProjectSDG(project_id=new_project.id, sdg_number=sdg_number)
+    for entry in project_data.sdgs:
+        sdg = ProjectSDG(
+            project_id=new_project.id,
+            sdg_number=entry.sdg_number,
+            justification=entry.justification,
+        )
         db.add(sdg)
 
     # Add typologies
@@ -235,8 +239,12 @@ async def update_project_by_token(
 
     # Re-add relationships
     # Add SDGs
-    for sdg_number in project_data.sdgs:
-        sdg = ProjectSDG(project_id=project.id, sdg_number=sdg_number)
+    for entry in project_data.sdgs:
+        sdg = ProjectSDG(
+            project_id=project.id,
+            sdg_number=entry.sdg_number,
+            justification=entry.justification,
+        )
         db.add(sdg)
 
     # Add typologies
@@ -387,10 +395,22 @@ def _format_project_response(project: Project) -> dict:
         "other_gov_text": project.other_gov_text,
         "authors": project.authors,
         "gdpr_consent": project.gdpr_consent,
-        "sdgs": [s.sdg_number for s in project.sdgs] if project.sdgs else [],
+        "sdgs": [
+            {"sdg_number": s.sdg_number, "justification": s.justification}
+            for s in project.sdgs
+        ] if project.sdgs else [],
         "image_urls": [img.image_url for img in sorted(project.images, key=lambda x: x.display_order)] if project.images else [],
         "rejection_reason": project.rejection_reason,
         "reviewer_notes": project.reviewer_notes,
+        "admin_vote_sdgs": [
+            v for v in [
+                getattr(project, 'admin_vote_sdg_1', None),
+                getattr(project, 'admin_vote_sdg_2', None),
+                getattr(project, 'admin_vote_sdg_3', None),
+            ] if v is not None
+        ],
+        "admin_voted_at": getattr(project, 'admin_voted_at', None),
+        "admin_voted_by": getattr(project, 'admin_voted_by', None),
         "created_at": project.created_at,
         "updated_at": project.updated_at,
     }

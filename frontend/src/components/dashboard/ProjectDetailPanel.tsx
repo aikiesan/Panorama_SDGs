@@ -176,16 +176,19 @@ export default function ProjectDetailPanel({ project, onClose }: ProjectDetailPa
                   Sustainable Development Goals
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {project.sdgs.map((sdg) => (
-                    <div
-                      key={sdg}
-                      className="flex items-center justify-center w-10 h-10 rounded font-bold text-white text-sm shadow-sm hover:shadow-md transition-shadow cursor-help"
-                      style={{ backgroundColor: SDG_COLORS[sdg] }}
-                      title={`SDG ${sdg}: ${SDG_NAMES[sdg]}`}
-                    >
-                      {sdg}
-                    </div>
-                  ))}
+                  {project.sdgs.map((entry) => {
+                    const sdgNum = typeof entry === 'number' ? entry : entry.sdg_number;
+                    return (
+                      <div
+                        key={sdgNum}
+                        className="flex items-center justify-center w-10 h-10 rounded font-bold text-white text-sm shadow-sm hover:shadow-md transition-shadow cursor-help"
+                        style={{ backgroundColor: SDG_COLORS[sdgNum] }}
+                        title={`SDG ${sdgNum}: ${SDG_NAMES[sdgNum]}`}
+                      >
+                        {sdgNum}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
