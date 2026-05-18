@@ -41,10 +41,10 @@ export default function Header() {
             />
             <div>
               <h1 className="text-xl font-display font-semibold text-black tracking-uia-normal">
-                Panorama SDG
+                {t('header.title')}
               </h1>
               <p className="text-xs text-uia-dark tracking-uia-wide font-display uppercase">
-                Union of International Architects
+                {t('header.subtitle')}
               </p>
             </div>
           </Link>

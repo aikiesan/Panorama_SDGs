@@ -1,4 +1,8 @@
 {
+  "header": {
+    "title": "Panorama SDG",
+    "subtitle": "Union of International Architects"
+  },
   "nav": {
     "home": "Home",
     "explore": "Explore Projects",
@@ -15,7 +19,8 @@
     "join_work_programme": "Join a Work Programme",
     "join_commission": "Join a Commission",
     "validate_school": "Validate your architecture school",
-    "follow_uia": "Follow UIA"
+    "follow_uia": "Follow UIA",
+    "copyright": "© 2026 - International Union of Architects —"
   },
   "landing": {
     "hero_title": "Showcase Your Urban Innovation",

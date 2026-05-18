@@ -1,4 +1,8 @@
 {
+  "header": {
+    "title": "Panorama ODD",
+    "subtitle": "Union Internationale des Architectes"
+  },
   "nav": {
     "home": "Accueil",
     "explore": "Explorer les projets",
@@ -15,7 +19,8 @@
     "join_work_programme": "Rejoindre un programme de travail",
     "join_commission": "Rejoindre une commission",
     "validate_school": "Valider votre école d'architecture",
-    "follow_uia": "Suivez l'UIA"
+    "follow_uia": "Suivez l'UIA",
+    "copyright": "© 2026 - Union Internationale des Architectes —"
   },
   "landing": {
     "hero_title": "Mettez en valeur votre innovation urbaine",

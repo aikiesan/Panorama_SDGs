@@ -138,7 +138,7 @@ export default function Footer() {
         {/* Bottom Copyright Bar */}
         <div className="pt-8 border-t border-uia-dark text-center">
           <p className="text-sm font-sans text-uia-dark">
-            © 2026 - International Union of Architects — {t('footer.rights')}
+            {t('footer.copyright')} {t('footer.rights')}
           </p>
         </div>
       </div>

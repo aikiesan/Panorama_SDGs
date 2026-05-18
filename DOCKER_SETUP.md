@@ -4,10 +4,36 @@ Step-by-step instructions for deploying Panorama SDG on a new machine.
 
 ## Prerequisites
 
-- Docker Desktop (Windows/Mac) or Docker Engine + Compose v2 (Linux)
+- Docker Engine + Compose v2 (Linux VM) — see install instructions below
 - Git
 - 8 GB RAM recommended (PostgreSQL + MinIO + FastAPI + Vite)
 - Port availability: 5173 (frontend), 8080 (backend API), 9000/9001 (MinIO)
+
+---
+
+## 0. Install Docker Engine on a fresh Ubuntu/Debian VM
+
+Skip this step if Docker is already installed (`docker --version`).
+
+```bash
+# Install Docker Engine (Ubuntu 22.04 / 24.04)
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+  | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
+  | sudo tee /etc/apt/sources.list.d/docker.list
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io \
+  docker-buildx-plugin docker-compose-plugin
+# Allow running docker without sudo (re-login required after this)
+sudo usermod -aG docker $USER
+```
+
+Verify: `docker --version` and `docker compose version`
 
 ---
 
@@ -36,6 +62,11 @@ Open `backend/.env` and set at minimum:
 | `ADMIN_EMAIL` | Where submission notifications go |
 
 Everything else has working defaults for local Docker development. You do **not** need to touch the root `.env` unless you want to change MinIO or PostgreSQL passwords.
+
+> **Container naming note:** Docker Compose names containers using the **parent folder name**.
+> If you cloned into `atlas_33/` the containers are `atlas_33-db-1`, `atlas_33-backend-1`, etc.
+> If you cloned into `Panorama_SDGs/` they are `panorama_sdgs-db-1`, etc.
+> Adjust all `docker exec` commands below to match, or check with `docker compose ps`.
 
 ## 3. Start the stack
 
@@ -149,6 +180,43 @@ The file `data/sql/image_manifest.csv` maps every image file to its project code
 
 ---
 
+---
+
+## Production security checklist
+
+Complete these steps before exposing the app to the public internet:
+
+| Item | Action |
+|------|--------|
+| Admin API key | Set a strong random value: `openssl rand -hex 32` → paste into `ADMIN_API_KEY` in `.env` |
+| JWT secret | Set a strong random value: `openssl rand -hex 32` → paste into `SECRET_KEY` in `backend/.env` |
+| MinIO credentials | Change `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` from the defaults in `.env` |
+| Default admin password | Edit `backend/scripts/create_admin.py` to change `Panorama2030!` **before** running step 4b |
+| CORS origins | Set `CORS_ORIGINS` and `CORS_ORIGIN_REGEX` in `.env` to your actual domain |
+| IMAGE_BASE_URL | Set to your public MinIO URL (e.g. `https://minio.your-domain.org/project-images`) |
+| VITE_API_URL | Set in `frontend/.env` to your backend domain (e.g. `https://api.your-domain.org`) |
+
+---
+
+## Firewall (ufw)
+
+```bash
+sudo ufw allow 22        # SSH — keep this open or you'll be locked out
+sudo ufw allow 80        # HTTP  (needed if using a reverse proxy like Nginx/Caddy)
+sudo ufw allow 443       # HTTPS (needed if using a reverse proxy)
+# Development/direct access only — block these in production:
+sudo ufw allow 5173      # Vite frontend
+sudo ufw allow 8080      # FastAPI backend
+sudo ufw allow 9000      # MinIO API
+sudo ufw allow 9001      # MinIO console
+sudo ufw enable
+```
+
+> **Production recommendation:** Put Nginx or Caddy in front (ports 80/443) and block
+> ports 5173, 8080, 9000, 9001 from the public internet.
+
+---
+
 ## Stopping and restarting
 
 ```bash
@@ -165,10 +233,13 @@ docker compose down -v     # DANGER: also deletes database volume
 ## Updating to a new version
 
 ```bash
-git pull
-docker compose build       # rebuild images if Dockerfile changed
-docker compose up -d
+git pull origin main
+docker compose build       # rebuild images if Dockerfile or requirements changed
+docker compose up -d       # rolling restart — keeps DB/MinIO volumes intact
 ```
+
+> Use `docker compose build --no-cache` if you want a fully clean rebuild (slower).
+> Migrations run automatically on backend startup via `alembic upgrade head`.
 
 ---
 
