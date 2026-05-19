@@ -64,3 +64,5 @@ build/
 *.pdf
 .gemini/
 .claude/
+frontend/public/project_images/
+.claude/
