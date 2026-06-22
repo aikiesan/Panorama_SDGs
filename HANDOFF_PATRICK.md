@@ -275,6 +275,19 @@ docker compose up -d --build
 Your settings in `.env` (API URL, CORS, credentials) are git-ignored and are
 preserved across updates — you never need to re-edit tracked files.
 
+After updating to the admin-dashboard release, apply the new database column and
+clear the legacy review queue (one time):
+
+```bash
+docker compose exec backend alembic upgrade head
+docker compose exec backend python scripts/archive_pending_projects.py            # dry run (preview)
+docker compose exec backend python scripts/archive_pending_projects.py --apply    # archive
+```
+
+This moves the previously-submitted (not selected) projects out of the review
+queue into the new "Archived" tab. Their status and public-map visibility are
+unchanged; the queue then starts clean for new submissions.
+
 > **One-time migration (first update only).** Older versions had you edit
 > `VITE_API_URL` / `CORS_ORIGINS` directly inside `docker-compose.yml`. Those values
 > now live in the git-ignored root `.env`. Before your first `git pull`:

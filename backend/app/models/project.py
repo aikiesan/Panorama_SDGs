@@ -100,6 +100,10 @@ class Project(Base):
     # Compliance
     gdpr_consent = Column(Boolean, default=False, nullable=False)
 
+    # Admin: archive a submission out of the review queue (keeps workflow_status;
+    # does not affect public map visibility)
+    is_archived = Column(Boolean, default=False, nullable=False, index=True)
+
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
