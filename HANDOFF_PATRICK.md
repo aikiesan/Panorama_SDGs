@@ -48,6 +48,7 @@ cd atlas_33
 
 ```bash
 copy backend\.env.example backend\.env
+copy .env.example .env
 ```
 
 Open `backend\.env` in a text editor and set:
@@ -64,6 +65,11 @@ To generate a SECRET_KEY, you can use any password generator or run:
 ```
 
 **Everything else** (database, MinIO, ports) has working defaults — do not change unless needed.
+
+> The root `.env` holds the values the platform bakes/serves at deploy time —
+> `VITE_API_URL` (frontend → API), `CORS_ORIGINS`, and `MINIO_PUBLIC_URL`. The
+> defaults target `localhost` and are fine for a first local run; change them for
+> your real domain in **Step 8**. `.env` is git-ignored, so it survives updates.
 
 ---
 
@@ -238,20 +244,48 @@ server {
 }
 ```
 
-### After setting your domain, update these two values in `docker-compose.yml`:
+### After setting your domain, set these values in the root `.env` file (not in `docker-compose.yml`):
 
-```yaml
-# In the frontend service environment block:
-VITE_API_URL=https://api.panorama.uia.archi
-
-# In the backend service environment block:
-CORS_ORIGINS=https://panorama.uia.archi
+```
+VITE_API_URL=https://api.panorama.uia.archi      # baked into the frontend at build time
+CORS_ORIGINS=https://panorama.uia.archi          # backend allow-list
+MINIO_PUBLIC_URL=https://api.panorama.uia.archi  # public base URL browsers use for images (adjust as needed)
 ```
 
-Then restart:
+`.env` is git-ignored, so these survive future `git pull` updates without conflicts.
+
+The frontend is served as a static production build by **Nginx** (not the Vite dev
+server), so `VITE_API_URL` is compiled into the bundle and must be set **before**
+building. Rebuild to apply:
 ```bash
 docker compose up -d --build
 ```
+
+---
+
+## Updating an Existing Deployment
+
+To pull the latest version of the platform:
+
+```bash
+git pull
+docker compose up -d --build
+```
+
+Your settings in `.env` (API URL, CORS, credentials) are git-ignored and are
+preserved across updates — you never need to re-edit tracked files.
+
+> **One-time migration (first update only).** Older versions had you edit
+> `VITE_API_URL` / `CORS_ORIGINS` directly inside `docker-compose.yml`. Those values
+> now live in the git-ignored root `.env`. Before your first `git pull`:
+> 1. Note your current `VITE_API_URL` and `CORS_ORIGINS` from your edited `docker-compose.yml`.
+> 2. Discard the local edit so the pull is clean: `git checkout -- docker-compose.yml`
+> 3. `git pull`
+> 4. Put those values into the root `.env` (copy `.env.example` to `.env` first if needed).
+> 5. `docker compose up -d --build`
+>
+> The frontend is now a fast static **Nginx** build instead of the Vite dev server,
+> so a rebuild (`--build`) is required for a changed `VITE_API_URL` to take effect.
 
 ---
 

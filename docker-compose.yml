@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:17-alpine
@@ -60,13 +58,14 @@ services:
         required: false
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-panorama_local}@db:5432/${POSTGRES_DB:-panorama_sdg}
-      - CORS_ORIGINS=http://localhost:3000,http://localhost:5173,http://localhost:5174
-      - ENVIRONMENT=development
+      # Deploy-specific values read from the git-ignored root .env (defaults are for local dev).
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173,http://localhost:5174}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER:-minioadmin}
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD:-minioadmin}
       - MINIO_BUCKET=project-images
-      - MINIO_PUBLIC_URL=http://localhost:9000
+      - MINIO_PUBLIC_URL=${MINIO_PUBLIC_URL:-http://localhost:9000}
     depends_on:
       db:
         condition: service_healthy
@@ -76,15 +75,13 @@ services:
   frontend:
     build:
       context: ./frontend
-      target: dev
-    command: npm run dev -- --host
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      target: nginx
+      args:
+        # Baked into the static bundle at build time (Vite requirement).
+        # Set VITE_API_URL in the root .env for production deployments.
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
     ports:
-      - "5173:5173"
-    environment:
-      - VITE_API_URL=http://localhost:8080
+      - "5173:80"
     depends_on:
       - backend
 
