@@ -395,6 +395,7 @@ def _format_project_response(project: Project) -> dict:
         "other_gov_text": project.other_gov_text,
         "authors": project.authors,
         "gdpr_consent": project.gdpr_consent,
+        "is_archived": getattr(project, 'is_archived', False),
         "sdgs": [
             {"sdg_number": s.sdg_number, "justification": s.justification}
             for s in project.sdgs

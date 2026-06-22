@@ -184,6 +184,7 @@ class ProjectResponse(ProjectBase):
     admin_vote_sdgs: Optional[List[int]] = None  # derived from 3 vote columns
     admin_voted_at: Optional[datetime] = None
     admin_voted_by: Optional[str] = None
+    is_archived: bool = False
     created_at: datetime
     updated_at: datetime
 

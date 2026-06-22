@@ -38,7 +38,8 @@ async def get_pending_projects(
         Project.workflow_status.in_([
             WorkflowStatus.SUBMITTED,
             WorkflowStatus.IN_REVIEW
-        ])
+        ]),
+        Project.is_archived == False
     ).order_by(Project.created_at.desc())
 
     total = query.count()
@@ -60,6 +61,7 @@ async def get_all_projects(
     workflow_status: str = None,
     voted: Optional[bool] = None,
     search: Optional[str] = None,
+    archived: Optional[bool] = None,
     current_user: User = Depends(get_current_admin),
     db: Session = Depends(get_db)
 ):
@@ -69,6 +71,11 @@ async def get_all_projects(
 
     if workflow_status:
         query = query.filter(Project.workflow_status == workflow_status)
+
+    if archived is True:
+        query = query.filter(Project.is_archived == True)
+    elif archived is False:
+        query = query.filter(Project.is_archived == False)
 
     if voted is True:
         query = query.filter(Project.admin_vote_sdg_1 != None)
@@ -265,6 +272,53 @@ async def vote_sdgs(
     project.admin_vote_sdg_3 = body.sdg_numbers[2]
     project.admin_voted_at = datetime.utcnow()
     project.admin_voted_by = current_user.email
+    db.commit()
+    db.refresh(project)
+
+    return _format_project_response(project)
+
+
+@router.post("/projects/{project_id}/archive", response_model=ProjectResponse)
+async def archive_project(
+    project_id: UUID,
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Archive a submission: remove it from the review queue without changing its
+    workflow status or its public-map visibility."""
+
+    project = db.query(Project).filter(Project.id == project_id).first()
+
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    project.is_archived = True
+    db.commit()
+    db.refresh(project)
+
+    return _format_project_response(project)
+
+
+@router.post("/projects/{project_id}/unarchive", response_model=ProjectResponse)
+async def unarchive_project(
+    project_id: UUID,
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Restore an archived submission back into the review queue."""
+
+    project = db.query(Project).filter(Project.id == project_id).first()
+
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    project.is_archived = False
     db.commit()
     db.refresh(project)
 

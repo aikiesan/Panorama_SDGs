@@ -21,13 +21,16 @@ export const adminAPI = {
     pageSize = 20,
     workflowStatus?: string,
     voted?: boolean | null,
-    search?: string
+    search?: string,
+    archived?: boolean | null
   ): Promise<PaginatedProjects> => {
     const params: Record<string, string | number> = { page, page_size: pageSize };
     if (workflowStatus) params.workflow_status = workflowStatus;
     if (voted === true) params.voted = 'true';
     if (voted === false) params.voted = 'false';
     if (search) params.search = search;
+    if (archived === true) params.archived = 'true';
+    if (archived === false) params.archived = 'false';
     const response = await apiClient.get('/api/admin/all-projects', { params });
     return response.data;
   },
@@ -70,6 +73,18 @@ export const adminAPI = {
     const response = await apiClient.post(`/api/admin/projects/${projectId}/vote`, {
       sdg_numbers: sdgNumbers,
     });
+    return response.data;
+  },
+
+  // Archive a submission (removes it from the review queue; keeps status + map visibility)
+  archiveProject: async (projectId: string): Promise<Project> => {
+    const response = await apiClient.post(`/api/admin/projects/${projectId}/archive`);
+    return response.data;
+  },
+
+  // Restore an archived submission back into the review queue
+  unarchiveProject: async (projectId: string): Promise<Project> => {
+    const response = await apiClient.post(`/api/admin/projects/${projectId}/unarchive`);
     return response.data;
   },
 };

@@ -92,6 +92,7 @@ export interface Project {
   adminVoteSdgs?: number[];
   adminVotedAt?: string;
   adminVotedBy?: string;
+  isArchived: boolean;
   createdAt: string;
   updatedAt: string;
 }
